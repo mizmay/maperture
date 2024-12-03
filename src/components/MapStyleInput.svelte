@@ -3,6 +3,9 @@
   import { createBranchUrl } from '../branch-utils';
   import { shortcut } from '../shortcut';
   import { fetchUrl } from '../fetch-url';
+  import StylesDropdown from './inputs/StylesDropdown.svelte';
+  import Dropdown from './inputs/Dropdown/Dropdown.svelte';
+
   const dispatch = createEventDispatcher();
 
   export let dropdownDisplayOptions;
@@ -10,6 +13,7 @@
   export let rendererOptions;
   export let rendererValue;
   export let activeUrl;
+  export let index;
 
   let selected;
 
@@ -192,23 +196,12 @@
 </script>
 
 <div class="map-style-input">
-  <select
-    id="styles"
-    on:change={e => dispatch('selectOption', { dropdownId: e.target.value })}
-  >
-    {#each Object.keys(dropdownDisplayOptions) as group}
-      <optgroup value={group} label={group}>
-        {#each dropdownDisplayOptions[group] as value}
-          <option
-            value={value.dropdownId}
-            selected={dropdownValue.dropdownId === value.dropdownId}
-          >
-            {value.text}
-          </option>
-        {/each}
-      </optgroup>
-    {/each}
-  </select>
+  <StylesDropdown
+    {dropdownDisplayOptions}
+    {dropdownValue}
+    {index}
+    onSelect={v => dispatch('selectOption', { dropdownId: v })}
+  />
 
   {#if selected?.dropdownType === 'custom' || selected?.dropdownType === 'branch'}
     <div class="custom-input">
@@ -236,15 +229,12 @@
 
   <div class="renderer-control">
     <span class="nowrap">Rendered with</span>
-    <select
-      on:change={e => dispatch('selectRenderer', { value: e.target.value })}
-    >
-      {#each rendererOptions as option}
-        <option value={option.value} selected={option.value === rendererValue}>
-          {option.name}
-        </option>
-      {/each}
-    </select>
+    <Dropdown
+      options={rendererOptions.map(v => ({ label: v.name, value: v.value }))}
+      activeValue={rendererValue}
+      onSelect={v => dispatch('selectRenderer', { value: v })}
+      direction="up"
+    />
   </div>
 </div>
 
@@ -254,10 +244,19 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    max-width: 300px;
   }
 
   .custom-input {
     margin-top: 0px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+  }
+
+  .custom-input input {
+    flex-grow: 1;
+    width: 0;
   }
 
   .input-error:focus {

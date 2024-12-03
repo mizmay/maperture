@@ -44,11 +44,15 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    max-width: 300px;
   }
 
   .map-name {
     font-size: 1.25em;
     font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .close-button {
@@ -75,7 +79,6 @@
     flex-direction: column;
     align-items: left;
     justify-content: center;
-    margin-right: 1em;
   }
 
   .location-control {
